@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test</title>
+    <script src= "js/three.module.js" type="module"></script>
+    <script src="js/three.js"></script>
+    <script src="js/GLTFLoader.js"></script>
+    <script src="js/OBJLoader.js"></script>
+    <script src="js/OrbitControls.js"></script>
+    <script src="js/TextGeometry.js"></script>
+    <script src="js/FontLoader.js"></script>
+
+</head>
+<body>
+    <script>
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color( 0xf0f0f0 );
+        scene.fog = new THREE.Fog( 0x000000, 250, 1400 );
+
+
+        // const geometry = new THREE.BoxGeometry(2,2,2);
+        // const material = new THREE.MeshLambertMaterial({
+        //     color:0x0000ff
+        // });
+        // var mesh = new THREE.Mesh(geometry, material);
+        // scene.add(mesh);
+        
+        var loader = new THREE.OBJLoader();
+        loader.load('images/kidney.obj',function ( obj ) {
+        console.log( obj );
+        console.log( obj.children[0].material );
+        obj.children[0].scale.set( 1, 1, 1 );
+        obj.children[0].position.set( 0,0,0 );
+        obj.children[0].material.color.set( 0xff7777 );
+        scene.add( obj );
+        function render(){
+            obj.children[0].rotateY( 0.01 );
+            renderer.render( scene, camera );
+            requestAnimationFrame( render );
+        }
+        render();
+        })
+
+        var ambient = new THREE.AmbientLight( 0xffffff, 0.5 );
+        scene.add( ambient );
+        var pointLight = new THREE.PointLight( 0xffffff, 0.9 );
+        pointLight.position.set( 10, 10, 10 );
+        scene.add( pointLight );
+
+        const axesHelper = new THREE.AxesHelper( 20 );
+        scene.add( axesHelper );
+
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+        var camera = new THREE.PerspectiveCamera( 45, width/height, 1, 100 );
+        camera.position.set( 0, 0, 50 );
+        camera.lookAt( 0,0,0 );
+
+        var renderer = new THREE.WebGLRenderer();
+        renderer.setSize( width, height );
+        renderer.render( scene, camera );
+        document.body.appendChild( renderer.domElement );
+
+        const controls = new THREE.OrbitControls( camera, renderer.domElement );
+
+        // //实现在模型上添加文字
+        // function addText(text, x, y, z) {
+        //     const canvas = document.createElement('canvas');
+        //     const context = canvas.getContext('2d');
+        //     //设置canvas的宽高
+        //     canvas.width = 256;
+        //     canvas.height = 256;
+        //     //设置canvas的背景颜色
+        //     context.fillStyle = 'rgba(255,1,1,1)';
+        //     context.fillRect(0, 0, 256, 256);
+        //     //设置文字样式
+        //     context.font = "Bold 100px Arial";
+        //     context.fillStyle = "rgba(0,0,0,1)";
+        //     context.textAlign = 'center';
+        //     context.textBaseline = 'middle';
+        //     //设置文字内容
+        //     context.fillText(text, 128, 128);
+        //     //创建纹理对象
+        //     const texture = new THREE.Texture(canvas);
+        //     texture.needsUpdate = true;
+        //     //创建材质对象
+        //     const material = new THREE.MeshBasicMaterial({
+        //         map: texture,
+        //         transparent: true
+        //     });
+        //     //创建几何体对象
+        //     const geometry = new THREE.PlaneGeometry(1, 1);
+        //     //创建网格模型对象
+        //     const mesh = new THREE.Mesh(geometry, material);
+        //     //设置网格模型的位置
+        //     mesh.position.set(x, y, z);
+        //     //设置网格模型的缩放
+        //     mesh.scale.set(10, 10, 10);
+        //     //将网格模型添加到场景中
+        //     scene.add(mesh);
+        // }
+        // //调用函数
+        // addText('肾脏', 10, 0, 0);
+
+        const loader2 = new THREE.FontLoader();
+				loader2.load( 'three.js-dev/examples/fonts/helvetiker_regular.typeface.json', function ( font ) {
+
+					const color = 0x006699;
+
+					const matDark = new THREE.LineBasicMaterial( {
+						color: color,
+						side: THREE.DoubleSide
+					} );
+
+					const matLite = new THREE.MeshBasicMaterial( {
+						color: color,
+						transparent: true,
+						opacity: 0.4,
+						side: THREE.DoubleSide
+					} );
+
+					const message = ' kidney ';
+
+					const shapes = font.generateShapes( message, 3 );
+
+					const geometry = new THREE.ShapeGeometry( shapes );
+
+					geometry.computeBoundingBox();
+
+					const xMid = - 0.5 * ( geometry.boundingBox.max.x - geometry.boundingBox.min.x );
+
+					geometry.translate( xMid, 0, 0 );
+
+					// make shape ( N.B. edge view not visible )
+
+					const text = new THREE.Mesh( geometry, matLite );
+					text.position.set( 10,0,0 );
+					scene.add( text );
+            });
+    </script>
+</body>
+</html>
